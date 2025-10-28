@@ -1,28 +1,36 @@
-import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { NextRequest, NextResponse } from "next/server";
+import connectToDatabase, { Paper } from "../../../../lib/mongodb";
 
-export async function POST(req: Request) {
-  const { paperId, userId } = await req.json();
-  const client = await clientPromise;
-  const db = client.db(process.env.MONGODB_DB);
+export async function POST(req: NextRequest) {
+  try {
+    await connectToDatabase();
 
-  await db.collection("papers").updateOne(
-    { _id: new ObjectId(paperId) },
-    { $addToSet: { memberIds: userId } }
-  );
+    const { paperId, userId } = await req.json();
 
-  return NextResponse.json({ success: true });
+    await Paper.findByIdAndUpdate(paperId, {
+      $addToSet: { memberIds: userId }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to add collaborator" }, { status: 500 });
+  }
 }
 
-export async function DELETE(req: Request) {
-  const { paperId, userId } = await req.json();
-  const client = await clientPromise;
-  const db = client.db(process.env.MONGODB_DB);
+export async function DELETE(req: NextRequest) {
+  try {
+    await connectToDatabase();
 
-  await db.collection("papers").updateOne(
-    { _id: new ObjectId(paperId) },
-    { $pull: { memberIds: userId } }
-  );
+    const { paperId, userId } = await req.json();
 
-  return NextResponse.json({ success: true });
+    await Paper.findByIdAndUpdate(paperId, {
+      $pull: { memberIds: userId }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to remove collaborator" }, { status: 500 });
+  }
 }
