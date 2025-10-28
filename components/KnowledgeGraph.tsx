@@ -9,7 +9,7 @@ import ReactFlow, {
   useEdgesState,
   Controls,
   Background,
-} from "react-flow-renderer";
+} from "@xyflow/react";
 
 interface Paper {
   id: string;
@@ -100,7 +100,7 @@ export default function KnowledgeGraph({ papers }: KnowledgeGraphProps) {
       target: paper.id,
       type: 'smoothstep',
       style: { stroke: '#9333ea', strokeWidth: 2 },
-      markerEnd: { type: 'arrowclosed' as const },
+      markerEnd: { type: 'arrowclosed' },
     }));
 
     setNodes(allNodes);
